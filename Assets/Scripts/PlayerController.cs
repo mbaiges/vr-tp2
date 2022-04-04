@@ -60,7 +60,7 @@ public class PlayerController : MonoBehaviour
     // Updaters
 
     private void UpdateGUI() {
-        gui.text = (Time.time < guiMessageOnScreenTime) ? "¡Avoid the meteors and reach the Island!" : "";
+        gui.text = (Time.time < guiMessageOnScreenTime) ? gui.text : "";
     }
 
     // Action handlers
