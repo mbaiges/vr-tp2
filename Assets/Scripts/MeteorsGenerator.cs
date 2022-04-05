@@ -4,54 +4,88 @@ using UnityEngine;
 
 public class MeteorsGenerator : MonoBehaviour
 {
+    public float distanceFromPlayer = 10f;
+    public float sidesDistance = 10f;
+    public float minHeight = 10f;
+    public float maxHeight = 20f;
+    public float minScaling = 6f;
+    public float maxScaling = 12f;
+
+    public float aimMargin = 10f;
+    public float hitTime = 10f;
+
     public GameObject meteorsHolder;
     public GameObject prefab;
     public GameObject player;
 
+    private Vector3 playerPosition;
     private float nextMeteorAt = 2f;
     private float maxMeteorDepth = -15f;
 
     private void Update() {
+        FindPlayer();
+
         if (Time.time > nextMeteorAt) {
-            ThrowMeteor();
+            Meteor();
             nextMeteorAt = Time.time + Random.Range(0f, 5f);
         }
 
         DestroyDistantMeteors();
     }
 
-    private Vector3 GetSpawnPosition() {
-        return new Vector3(0, 4, 0);
+    private void FindPlayer() {
+        playerPosition = player.transform.position;
+        playerPosition.y = 0f;
     }
 
-    private void ThrowMeteor() {
-        Vector3 spawnPosition = GetSpawnPosition();
-        Debug.Log("Spawning meteor at " + spawnPosition);
-        GameObject meteor = GenerateRandomMeteor(spawnPosition);
-        meteor.transform.parent = meteorsHolder.transform;
+    private Vector3 GetSpawnPosition() {
+        Vector3 forward = Camera.main.transform.forward.normalized;
+        Vector3 backward = -forward;
+        
+        Vector3 perpendicular = Vector3.Cross(forward, Vector3.up).normalized;
+        Debug.Log(perpendicular);
+        Vector3 spawn = playerPosition + backward * distanceFromPlayer + Random.Range(-sidesDistance, sidesDistance) * perpendicular;
+        spawn.y = Random.Range(minHeight, maxHeight);
+
+        return spawn;
     }
 
     private GameObject GenerateRandomMeteor(Vector3 spawnPosition) {
-        GameObject meteor = Instantiate(prefab, spawnPosition, Quaternion.identity);
+        GameObject meteor = Instantiate(prefab, spawnPosition, Random.rotation);
 
-        MeshFilter meshFilter = meteor.GetComponent<MeshFilter>();
-        Debug.Log(meshFilter);
-
-        Vector3[] vertices = meshFilter.mesh.vertices;
-        for (int i = 0; i < vertices.Length; i++) {
-            if (Random.Range(0, 1) < 0.1f) {
-                Vector3 vertex = vertices[i];
-
-                float change = Random.Range(0, 0.003f);
-                Vector3 normal = Vector3.Normalize(vertex - meteor.transform.position);
-                int direction = Random.Range(0,1) < 0.5f ? 1 : -1;
-                vertices[i] = vertex + direction * normal * change;
-            }
-        }
-
-        meshFilter.mesh.vertices = vertices;
+        Vector3 scaling = new Vector3(Random.Range(minScaling, maxScaling), Random.Range(minScaling, maxScaling), Random.Range(minScaling, maxScaling));
+        Vector3 scale = new Vector3(meteor.transform.lossyScale.x * scaling.x, meteor.transform.lossyScale.y * scaling.y, meteor.transform.lossyScale.z * scaling.z);
+        meteor.transform.localScale = scale;
+        meteor.transform.SetParent(meteorsHolder.transform);
 
         return meteor;
+    }
+
+    private Vector3 CalculateThrowingForce(GameObject meteor, Rigidbody body) {
+        float mass = body.mass;
+        Vector3 origin = meteor.transform.position;
+        Vector3 forward = Camera.main.transform.forward.normalized;
+        Vector3 perpendicular = Vector3.Cross(forward, Vector3.up).normalized;
+        
+        Vector3 destination = playerPosition + forward * Random.Range(0, aimMargin) + perpendicular * Random.Range(-aimMargin, aimMargin);
+        float timeToDestination = hitTime;
+
+        // Calculate initial Force using origin, destination and timeToDestination
+
+        return Vector3.zero;
+    }
+
+    private void ThrowMeteor(GameObject meteor) {
+        Rigidbody body = meteor.GetComponent<Rigidbody>();
+        Vector3 force = CalculateThrowingForce(meteor, body);
+        body.AddForce(force, ForceMode.Force);
+    }
+
+    private void Meteor() {
+        Vector3 spawnPosition = GetSpawnPosition();
+        Debug.Log("Spawning meteor at " + spawnPosition);
+        GameObject meteor = GenerateRandomMeteor(spawnPosition);
+        ThrowMeteor(meteor);
     }
 
     private void DestroyDistantMeteors() {
