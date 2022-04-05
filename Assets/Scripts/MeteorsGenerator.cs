@@ -14,6 +14,7 @@ public class MeteorsGenerator : MonoBehaviour
 
     public float minScaling = 6f;
     public float maxScaling = 12f;
+    public float maxAngVelocity = 6f;
 
     public float aimMargin = 10f;
     public float minHitTime = 10f;
@@ -99,6 +100,7 @@ public class MeteorsGenerator : MonoBehaviour
         Rigidbody body = meteor.GetComponent<Rigidbody>();
         Vector3 initialVelocity = CalculateInitialVelocity(meteor, body);
         body.velocity = initialVelocity;
+        body.angularVelocity = new Vector3(Random.Range(0, maxAngVelocity), Random.Range(0, maxAngVelocity), Random.Range(0, maxAngVelocity)); // Add spin
     }
 
     private void Meteor() {
