@@ -365,12 +365,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   distanceFromPlayer: 500
   sidesDistance: 500
-  minHeight: 20
-  maxHeight: 50
-  minScaling: 17
+  minTimeBetweenMeteors: 5
+  maxTimeBetweenMeteors: 10
+  minHeight: 100
+  maxHeight: 150
+  minScaling: 12
   maxScaling: 25
   aimMargin: 10
-  hitTime: 5
+  minHitTime: 10
+  maxHitTime: 15
   meteorsHolder: {fileID: 283969683}
   prefab: {fileID: 6294521941959177003, guid: 12cc5444b82842b418fb19c763e08375, type: 3}
   player: {fileID: 1329481575}
@@ -433,7 +436,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 33
+    m_FontSize: 29
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 10
@@ -1317,6 +1320,7 @@ MonoBehaviour:
   gui: {fileID: 287348488}
   guiDamageOverlay: {fileID: 691677202}
   speedActionReference: {fileID: 187161793506945269, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  meteorsGenerator: {fileID: 283969685}
   boatSpeed: 5
 --- !u!114 &1329481585
 MonoBehaviour:

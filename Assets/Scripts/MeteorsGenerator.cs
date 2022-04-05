@@ -6,28 +6,38 @@ public class MeteorsGenerator : MonoBehaviour
 {
     public float distanceFromPlayer = 10f;
     public float sidesDistance = 10f;
+    public float minTimeBetweenMeteors = 5f;
+    public float maxTimeBetweenMeteors = 10f;
+
     public float minHeight = 10f;
     public float maxHeight = 20f;
+
     public float minScaling = 6f;
     public float maxScaling = 12f;
 
     public float aimMargin = 10f;
-    public float hitTime = 10f;
+    public float minHitTime = 10f;
+    public float maxHitTime = 10f;
 
     public GameObject meteorsHolder;
     public GameObject prefab;
     public GameObject player;
 
     private Vector3 playerPosition;
-    private float nextMeteorAt = 2f;
+    private float nextMeteorAt;
     private float maxMeteorDepth = -15f;
+    private int disappearedMeteors = 0;
+
+    private void Start() {
+        nextMeteorAt = Time.time + Random.Range(minTimeBetweenMeteors, maxTimeBetweenMeteors);
+    }
 
     private void Update() {
         FindPlayer();
 
         if (Time.time > nextMeteorAt) {
             Meteor();
-            nextMeteorAt = Time.time + Random.Range(0f, 5f);
+            nextMeteorAt = Time.time + Random.Range(minTimeBetweenMeteors, maxTimeBetweenMeteors);
         }
 
         DestroyDistantMeteors();
@@ -43,7 +53,6 @@ public class MeteorsGenerator : MonoBehaviour
         Vector3 backward = -forward;
         
         Vector3 perpendicular = Vector3.Cross(forward, Vector3.up).normalized;
-        Debug.Log(perpendicular);
         Vector3 spawn = playerPosition + backward * distanceFromPlayer + Random.Range(-sidesDistance, sidesDistance) * perpendicular;
         spawn.y = Random.Range(minHeight, maxHeight);
 
@@ -61,29 +70,40 @@ public class MeteorsGenerator : MonoBehaviour
         return meteor;
     }
 
-    private Vector3 CalculateThrowingForce(GameObject meteor, Rigidbody body) {
+    private Vector3 CalculateInitialVelocity(GameObject meteor, Rigidbody body) {
         float mass = body.mass;
         Vector3 origin = meteor.transform.position;
         Vector3 forward = Camera.main.transform.forward.normalized;
         Vector3 perpendicular = Vector3.Cross(forward, Vector3.up).normalized;
         
         Vector3 destination = playerPosition + forward * Random.Range(0, aimMargin) + perpendicular * Random.Range(-aimMargin, aimMargin);
-        float timeToDestination = hitTime;
+        float hitTime = Random.Range(minHitTime, maxHitTime);
 
-        // Calculate initial Force using origin, destination and timeToDestination
+        float x = Vector3.Distance(origin, destination);
+        
+        // x - x0 = v0x*t
+        // v0x = (x - x0)/t
+        float v0x = x/hitTime;
 
-        return Vector3.zero;
+        // y - y0 = v0y*t + 1/2 * g * t^2
+        // v0y = ((y - y0) - 1/2 * g * t^2)/t
+        float y0 = origin.y;
+        float y = destination.y;
+        float g = Physics.gravity.y;
+        float v0y = ((y - y0) - 0.5f * g * Mathf.Pow(hitTime, 2))/hitTime;
+
+        return new Vector3(destination.x - origin.x, 0, destination.z - origin.z).normalized * v0x + new Vector3(0, v0y, 0);
     }
 
     private void ThrowMeteor(GameObject meteor) {
         Rigidbody body = meteor.GetComponent<Rigidbody>();
-        Vector3 force = CalculateThrowingForce(meteor, body);
-        body.AddForce(force, ForceMode.Force);
+        Vector3 initialVelocity = CalculateInitialVelocity(meteor, body);
+        body.velocity = initialVelocity;
     }
 
     private void Meteor() {
         Vector3 spawnPosition = GetSpawnPosition();
-        Debug.Log("Spawning meteor at " + spawnPosition);
+        // Debug.Log("Spawning meteor at " + spawnPosition);
         GameObject meteor = GenerateRandomMeteor(spawnPosition);
         ThrowMeteor(meteor);
     }
@@ -93,8 +113,26 @@ public class MeteorsGenerator : MonoBehaviour
             GameObject child = transform.GetChild(i).gameObject;
             if (child.transform.position.y < maxMeteorDepth) {
                 Object.Destroy(child);
+                disappearedMeteors++;
             }
         }
+    }
+
+    // Public methods
+
+    public int CountDisappearedMeteors() {
+        return disappearedMeteors;
+    }
+
+    public int CountMidAirMeteors() {
+        int count = 0;
+        for (int i = 0; i < transform.childCount; i++) {
+            GameObject child = transform.GetChild(i).gameObject;
+            if (child.transform.position.y > 1f) {
+                count++;
+            }
+        }
+        return count;
     }
 
 }
