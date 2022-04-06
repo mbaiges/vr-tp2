@@ -63,8 +63,9 @@ public class MeteorsGenerator : MonoBehaviour
     private GameObject GenerateRandomMeteor(Vector3 spawnPosition) {
         GameObject meteor = Instantiate(prefab, spawnPosition, Random.rotation);
 
-        Vector3 scaling = new Vector3(Random.Range(minScaling, maxScaling), Random.Range(minScaling, maxScaling), Random.Range(minScaling, maxScaling));
-        Vector3 scale = new Vector3(meteor.transform.lossyScale.x * scaling.x, meteor.transform.lossyScale.y * scaling.y, meteor.transform.lossyScale.z * scaling.z);
+        Vector3 scalingFactor = new Vector3(Random.Range(minScaling, maxScaling), Random.Range(minScaling, maxScaling), Random.Range(minScaling, maxScaling));
+        var lossyScale = meteor.transform.lossyScale;
+        Vector3 scale = new Vector3(lossyScale.x * scalingFactor.x, lossyScale.y * scalingFactor.y, lossyScale.z * scalingFactor.z);
         meteor.transform.localScale = scale;
         meteor.transform.SetParent(meteorsHolder.transform);
 
@@ -79,20 +80,20 @@ public class MeteorsGenerator : MonoBehaviour
         
         Vector3 destination = playerPosition + forward * Random.Range(0, aimMargin) + perpendicular * Random.Range(-aimMargin, aimMargin);
         float hitTime = Random.Range(minHitTime, maxHitTime);
-
+        
         float x = Vector3.Distance(origin, destination);
         
         // x - x0 = v0x*t
         // v0x = (x - x0)/t
         float v0x = x/hitTime;
-
+        
         // y - y0 = v0y*t + 1/2 * g * t^2
         // v0y = ((y - y0) - 1/2 * g * t^2)/t
         float y0 = origin.y;
         float y = destination.y;
         float g = Physics.gravity.y;
         float v0y = ((y - y0) - 0.5f * g * Mathf.Pow(hitTime, 2))/hitTime;
-
+        
         return new Vector3(destination.x - origin.x, 0, destination.z - origin.z).normalized * v0x + new Vector3(0, v0y, 0);
     }
 

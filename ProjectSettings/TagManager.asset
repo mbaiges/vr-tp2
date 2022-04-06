@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - World
+  - Enemy
+  - XROrigin
   layers:
   - Default
   - TransparentFX

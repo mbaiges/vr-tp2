@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
@@ -27,6 +28,8 @@ public class PlayerController : MonoBehaviour
 
     private float startTime;
     private float elapsedTime;
+
+    private string guiText;
 
     // Meteors
 
@@ -81,10 +84,6 @@ public class PlayerController : MonoBehaviour
 
     // Action handlers
 
-    private void OnCollisionEnter(Collision other) {
-        OnDeath();
-    }
-
     private void OnSpeed() {
         float gripValue = speedActionReference.action.ReadValue<float>();
         if (gripValue <= 0) {
@@ -102,17 +101,16 @@ public class PlayerController : MonoBehaviour
             _body.AddForce(Vector3.Normalize(new Vector3(direction.x, 0.5f, direction.z)), ForceMode.Acceleration);
         }
 
-        if(_body.velocity.magnitude > boatSpeed)
+        if (_body.velocity.magnitude > boatSpeed)
         {
             _body.velocity = _body.velocity.normalized * boatSpeed;
         }
 
     }
 
-    private void OnDeath() {
+    public void OnDeath() {
         Debug.Log("You're dead");
         new WaitForSeconds(5.0f);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); // Reset scene
     }
-
 }

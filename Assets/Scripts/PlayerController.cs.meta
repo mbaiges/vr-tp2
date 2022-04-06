@@ -3,7 +3,11 @@ guid: f06d376ff0120a348aa923b1e266d707
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - gui: {instanceID: 0}
+  - guiDamageOverlay: {instanceID: 0}
+  - speedActionReference: {fileID: 6972639530819350904, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  - meteorsGenerator: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
