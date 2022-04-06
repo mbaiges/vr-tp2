@@ -72,14 +72,14 @@ public class PlayerController : MonoBehaviour
         RevealSurvivedMeteors();
         RevealMidAirMeteors();
         if (elapsedTime > guiMessageOnScreenTime) {
-            string text = "Survived " + survivedMeteors + " meteor" + ((survivedMeteors != 1) ? "s" : "") + " so far.\n";
+            guiText = "Survived " + survivedMeteors + " meteor" + ((survivedMeteors != 1) ? "s" : "") + " so far.\n";
             if (midAirMeteors == 0) {
-                text += "No meteors yet.\nWatch your back!\n";
+                guiText += "No meteors yet.\nWatch your back!\n";
             } else {
-                text += "¡" + midAirMeteors + " meteor" + ((midAirMeteors != 1) ? "s" : "") + " in mid air!\n¡Watch out!\n";
+                guiText += "¡" + midAirMeteors + " meteor" + ((midAirMeteors != 1) ? "s" : "") + " in mid air!\n¡Watch out!\n";
             }
-            gui.text = text;
         }
+        gui.text = $"Alive for: {elapsedTime:0.00}s\n{guiText}";
     }
 
     // Action handlers
