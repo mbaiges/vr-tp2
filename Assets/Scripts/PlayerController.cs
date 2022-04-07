@@ -12,7 +12,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Text gui;
     [SerializeField] private Image guiDamageOverlay;
     
+    [SerializeField] private InputActionReference moveActionReference;
     [SerializeField] private InputActionReference speedActionReference;
+
+    [SerializeField] private BoatController boatController;
 
     public MeteorsGenerator meteorsGenerator;
 
@@ -55,6 +58,7 @@ public class PlayerController : MonoBehaviour
         _collider.center = new Vector3(center.x, _collider.center.y, center.z);
         _collider.height = _xrOrigin.CameraInOriginSpaceHeight;
 
+        OnTurn();
         OnSpeed();
         UpdateGUI();
     }
@@ -78,11 +82,24 @@ public class PlayerController : MonoBehaviour
             } else {
                 guiText += "¡" + midAirMeteors + " meteor" + ((midAirMeteors != 1) ? "s" : "") + " in mid air!\n¡Watch out!\n";
             }
+            gui.text = guiText;
         }
-        gui.text = $"Alive for: {elapsedTime:0.00}s\n{guiText}";
+        // gui.text = $"Alive for: {elapsedTime:0.00}s\n{guiText}";
     }
 
     // Action handlers
+
+    private void OnTurn() {
+        Vector2 axisValue = moveActionReference.action.ReadValue<Vector2>();
+        float turned = boatController.Turn(axisValue.x);
+        Turn(turned);
+    }
+
+    private void Turn(float turn) {
+        Vector3 rotation = Camera.main.transform.rotation.eulerAngles;
+        rotation.y += turn;
+        Camera.main.transform.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+    }
 
     private void OnSpeed() {
         float gripValue = speedActionReference.action.ReadValue<float>();
@@ -97,8 +114,14 @@ public class PlayerController : MonoBehaviour
         }
 
         if (speeding) {
-            Vector3 direction = Camera.main.transform.forward;
-            _body.AddForce(Vector3.Normalize(new Vector3(direction.x, 0.5f, direction.z)), ForceMode.Acceleration);
+            float angle = boatController.LookingAngle();
+            angle = Mathf.Deg2Rad * angle;
+            Debug.Log("Angle: " + angle);
+            Vector3 direction = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)).normalized;
+            Vector3 force = direction * boatSpeed;
+            force.y = 0.5f;
+            Debug.Log("Direction " + direction);
+            _body.AddForce(force, ForceMode.Acceleration);
         }
 
         if (_body.velocity.magnitude > boatSpeed)

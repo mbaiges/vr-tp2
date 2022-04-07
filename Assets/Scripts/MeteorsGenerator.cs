@@ -5,7 +5,6 @@ using UnityEngine;
 public class MeteorsGenerator : MonoBehaviour
 {
     public float distanceFromPlayer = 10f;
-    public float sidesDistance = 10f;
     public float minTimeBetweenMeteors = 5f;
     public float maxTimeBetweenMeteors = 10f;
 
@@ -54,7 +53,8 @@ public class MeteorsGenerator : MonoBehaviour
         Vector3 backward = -forward;
         
         Vector3 perpendicular = Vector3.Cross(forward, Vector3.up).normalized;
-        Vector3 spawn = playerPosition + backward * distanceFromPlayer + Random.Range(-sidesDistance, sidesDistance) * perpendicular;
+        float angle = Random.Range(0, 2*Mathf.PI);
+        Vector3 spawn = new Vector3(playerPosition.x + distanceFromPlayer * Mathf.Cos(angle), Random.Range(minHeight, maxHeight), playerPosition.z + distanceFromPlayer * Mathf.Cos(angle));
         spawn.y = Random.Range(minHeight, maxHeight);
 
         return spawn;
