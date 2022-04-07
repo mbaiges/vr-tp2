@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private BoatController boatController;
 
+    public AudioClip deadAudioClip;
+    public AudioSource engineAudioSource;
     public MeteorsGenerator meteorsGenerator;
 
     public float boatSpeed = 10f;
@@ -122,6 +124,7 @@ public class PlayerController : MonoBehaviour
             force.y = 0.5f;
             Debug.Log("Direction " + direction);
             _body.AddForce(force, ForceMode.Acceleration);
+            engineAudioSource.pitch = 1 + Mathf.Clamp(gripValue, 0, 1);
         }
 
         if (_body.velocity.magnitude > boatSpeed)
@@ -131,8 +134,9 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    public void OnDeath() {
-        Debug.Log("You're dead");
+    public void OnDeath()
+    {
+        Utils.PlayClipAtPoint(deadAudioClip, transform.position, 0f);
         new WaitForSeconds(5.0f);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); // Reset scene
     }

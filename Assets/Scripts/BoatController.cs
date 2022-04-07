@@ -11,9 +11,12 @@ public class BoatController : MonoBehaviour
         playerController = GameObject.FindGameObjectWithTag("XROrigin").GetComponent<PlayerController>();
     }
 
-    private void OnTriggerEnter(Collider other) {
-        Debug.Log(other.gameObject.tag);
-        playerController.OnDeath();
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            playerController.OnDeath();
+        }
     }
 
     // Public
