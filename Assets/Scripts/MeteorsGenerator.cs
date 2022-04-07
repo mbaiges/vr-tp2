@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 public class MeteorsGenerator : MonoBehaviour
 {
@@ -18,6 +21,8 @@ public class MeteorsGenerator : MonoBehaviour
     public float aimMargin = 10f;
     public float minHitTime = 10f;
     public float maxHitTime = 10f;
+    public int hitTimeDecrease = 3;
+    public int hitTimeDecreaseEvery = 5;
 
     public GameObject meteorsHolder;
     public GameObject prefab;
@@ -41,6 +46,16 @@ public class MeteorsGenerator : MonoBehaviour
         }
 
         DestroyDistantMeteors();
+    }
+
+    private void AdjustDifficulty()
+    {
+        if (hitTimeDecrease >= 0 && disappearedMeteors % hitTimeDecreaseEvery == 0)
+        {
+            hitTimeDecrease--;
+            minHitTime = Math.Max(minHitTime - 1, 1);
+            maxHitTime = Math.Max(maxHitTime - 1, 1);
+        }
     }
 
     private void FindPlayer() {
@@ -111,13 +126,20 @@ public class MeteorsGenerator : MonoBehaviour
         ThrowMeteor(meteor);
     }
 
-    private void DestroyDistantMeteors() {
+    private void DestroyDistantMeteors()
+    {
+        int previousMeteors = disappearedMeteors;
         for (int i = 0; i < transform.childCount; i++) {
             GameObject child = transform.GetChild(i).gameObject;
             if (child.transform.position.y < maxMeteorDepth) {
                 Object.Destroy(child);
                 disappearedMeteors++;
             }
+        }
+
+        if (previousMeteors != disappearedMeteors)
+        {
+            AdjustDifficulty();
         }
     }
 
