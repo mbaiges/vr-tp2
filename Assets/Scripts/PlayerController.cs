@@ -41,6 +41,10 @@ public class PlayerController : MonoBehaviour
     private int survivedMeteors = 0;
     private int midAirMeteors = 0;
 
+    // Death
+
+    private float resetAt = 0f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -63,6 +67,10 @@ public class PlayerController : MonoBehaviour
         OnTurn();
         OnSpeed();
         UpdateGUI();
+
+        if (resetAt > 0 && elapsedTime > resetAt) {
+            ResetScene();
+        }
     }
 
     // Updaters
@@ -134,10 +142,13 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    private void ResetScene() {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     public void OnDeath()
     {
         Utils.PlayClipAtPoint(deadAudioClip, transform.position, 0f);
-        new WaitForSeconds(5.0f);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); // Reset scene
+        resetAt = elapsedTime + 0.2f;
     }
 }
