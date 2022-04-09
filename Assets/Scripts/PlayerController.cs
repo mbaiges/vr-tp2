@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Unity.XR.CoreUtils;
 
-[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float guiMessageOnScreenTime = 5f;
@@ -21,6 +20,7 @@ public class PlayerController : MonoBehaviour
     public AudioSource engineAudioSource;
     public MeteorsGenerator meteorsGenerator;
     public GameObject playerContainer;
+    public float rotSpeed = 1f;
 
     public float boatSpeed = 10f;
     private bool speeding = false;
@@ -51,7 +51,7 @@ public class PlayerController : MonoBehaviour
     {
         _xrOrigin = GetComponent<XROrigin>();
         _collider = GetComponent<CapsuleCollider>();
-        _body = GetComponent<Rigidbody>();
+        _body = playerContainer.GetComponent<Rigidbody>();
         spawn = transform.position;
         startTime = Time.time;
     }
@@ -59,8 +59,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        playerContainer.transform.position = transform.position + transform.parent.transform.position;
-        transform.position = Vector3.zero;
         elapsedTime = Time.time - startTime;
 
         var center = _xrOrigin.CameraInOriginSpacePos;
@@ -88,7 +86,11 @@ public class PlayerController : MonoBehaviour
     private void UpdateGUI() {
         RevealSurvivedMeteors();
         RevealMidAirMeteors();
+        Debug.Log("midAir: " + midAirMeteors);
+        Debug.Log("survived: " + survivedMeteors);
+        Debug.Log("elapsedTime: " + elapsedTime);
         if (elapsedTime > guiMessageOnScreenTime) {
+            Debug.Log("guiText: " + guiText);
             guiText = "Survived " + survivedMeteors + " meteor" + ((survivedMeteors != 1) ? "s" : "") + " so far.\n";
             if (midAirMeteors == 0) {
                 guiText += "No meteors yet.\nWatch your back!\n";
@@ -110,7 +112,7 @@ public class PlayerController : MonoBehaviour
 
     private void Turn(float turn) {
         Vector3 rotation = playerContainer.transform.rotation.eulerAngles;
-        rotation.y += turn;
+        rotation.y += turn * rotSpeed;
         playerContainer.transform.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
     }
 

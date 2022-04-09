@@ -34,7 +34,7 @@ public class BoatController : MonoBehaviour
         Vector3 rotation = transform.rotation.eulerAngles;
         float turn = amount * turnMagnitude;
         rotation.y += turn;
-        transform.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+        // transform.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
         return turn;
     }
 }
