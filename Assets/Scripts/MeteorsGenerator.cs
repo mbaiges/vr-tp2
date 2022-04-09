@@ -89,15 +89,21 @@ public class MeteorsGenerator : MonoBehaviour
         return meteor;
     }
 
-    private Vector3 CalculateInitialVelocity(GameObject meteor, Rigidbody body) {
-        float mass = body.mass;
+    private Vector3 CalculateDestination(GameObject meteor) {
         Vector3 origin = meteor.transform.position;
         Vector3 forward = Camera.main.transform.forward.normalized;
         Vector3 perpendicular = Vector3.Cross(forward, Vector3.up).normalized;
         
-        Vector3 destination = playerPosition + forward * Random.Range(0, aimMargin) + perpendicular * Random.Range(-aimMargin, aimMargin);
+        Vector3 destination = playerPosition + forward * Random.Range(-aimMargin/2, aimMargin) + perpendicular * Random.Range(-aimMargin, aimMargin);
+        return destination;
+    }
+
+    private Vector3 CalculateInitialVelocity(GameObject meteor, Rigidbody body) {
+        Vector3 destination = CalculateDestination(meteor);
         float hitTime = Random.Range(minHitTime, maxHitTime);
         
+        Vector3 origin = meteor.transform.position;
+
         float x = Vector3.Distance(origin, destination);
         
         // x - x0 = v0x*t
