@@ -76,6 +76,8 @@ public class MeteorsGenerator : MonoBehaviour
     }
 
     private GameObject GenerateRandomMeteor(Vector3 spawnPosition) {
+        // Should not modify rotation if you want to add a tail to the meteor
+        // GameObject meteor = Instantiate(prefab, spawnPosition, Quaternion.identity);
         GameObject meteor = Instantiate(prefab, spawnPosition, Random.rotation);
 
         Vector3 scalingFactor = new Vector3(Random.Range(minScaling, maxScaling), Random.Range(minScaling, maxScaling), Random.Range(minScaling, maxScaling));
@@ -116,6 +118,7 @@ public class MeteorsGenerator : MonoBehaviour
         Rigidbody body = meteor.GetComponent<Rigidbody>();
         Vector3 initialVelocity = CalculateInitialVelocity(meteor, body);
         body.velocity = initialVelocity;
+        // Should not modify rotation if you want to add a tail to the meteor
         body.angularVelocity = new Vector3(Random.Range(0, maxAngVelocity), Random.Range(0, maxAngVelocity), Random.Range(0, maxAngVelocity)); // Add spin
     }
 
