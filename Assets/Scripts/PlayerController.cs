@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     public AudioClip deadAudioClip;
     public AudioSource engineAudioSource;
     public MeteorsGenerator meteorsGenerator;
+    public GameObject playerContainer;
 
     public float boatSpeed = 10f;
     private bool speeding = false;
@@ -58,6 +59,8 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        playerContainer.transform.position = transform.position + transform.parent.transform.position;
+        transform.position = Vector3.zero;
         elapsedTime = Time.time - startTime;
 
         var center = _xrOrigin.CameraInOriginSpacePos;
@@ -106,9 +109,9 @@ public class PlayerController : MonoBehaviour
     }
 
     private void Turn(float turn) {
-        Vector3 rotation = Camera.main.transform.rotation.eulerAngles;
+        Vector3 rotation = playerContainer.transform.rotation.eulerAngles;
         rotation.y += turn;
-        Camera.main.transform.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+        playerContainer.transform.rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
     }
 
     private void OnSpeed() {
